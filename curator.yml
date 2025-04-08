@@ -1,0 +1,10 @@
+client:
+  hosts:
+    - ${ELASTICSEARCH_HOST}
+  username: ${ELASTICSEARCH_AUTH_USERNAME}
+  password: ${ELASTICSEARCH_AUTH_PASSWORD}
+
+logging:
+  loglevel: INFO
+  logfile:
+  logformat: default
