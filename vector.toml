@@ -1,0 +1,25 @@
+[sources.http]
+type = "http_server"
+address= "0.0.0.0:${VECTOR_PORT}"
+
+# useful for debugging locally
+# [sources.file]
+# type = "file"
+# include = ["/var/logs/*"]
+
+[transforms.parse_logs]
+type= "remap"
+file = "/etc/vector/transforms.vrl"
+inputs = ["http"]
+
+
+[sinks.console]
+type = "console"
+encoding.codec = "json"
+inputs = ["parse_logs"]
+
+[sinks.timescaledb]
+type = "postgres"
+inputs = ["parse_logs"]
+endpoint = "postgres://postgres@log_db:5432/postgres"
+table = "logs"
