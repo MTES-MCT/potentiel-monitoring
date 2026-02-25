@@ -5,14 +5,14 @@ type = "http_server"
 address= "0.0.0.0:${VECTOR_PORT}"
 
 # useful for debugging locally
-[sources.file]
-type = "file"
-include = ["/var/logs/*"]
+#[sources.file]
+#type = "file"
+#include = ["/var/logs/*"]
 
 [transforms.parse_logs]
 type= "remap"
 file = "/app/transforms.vrl"
-inputs = ["http","file"]
+inputs = ["http"]
 
 
 # useful for debugging locally
