@@ -40,10 +40,10 @@ services:
   vector:
     container_name: log_vector
     image: timberio/vector:0.53.0-debian
-    command: ["--config","/etc/vector/custom/vector.toml"]
+    command: ["--config","/app/vector.toml"]
     volumes:
-      - ./vector.toml:/etc/vector/custom/vector.toml:ro
-      - ./transforms.vrl:/etc/vector/transforms.vrl:ro
+      - ./vector.toml:/app/vector.toml:ro
+      - ./transforms.vrl:/app/transforms.vrl:ro
       # - ./logs:/var/logs:ro
     environment:
       VECTOR_DB_URL: "postgres://postgres@log_db:5432/postgres"

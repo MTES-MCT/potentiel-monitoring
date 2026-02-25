@@ -11,7 +11,7 @@ include = ["/var/logs/*"]
 
 [transforms.parse_logs]
 type= "remap"
-file = "/etc/vector/transforms.vrl"
+file = "/app/transforms.vrl"
 inputs = ["http","file"]
 
 
