@@ -48,6 +48,7 @@ services:
     environment:
       VECTOR_DB_URL: "postgres://postgres@log_db:5432/postgres"
       VECTOR_PORT: "1234"
+      VECTOR_TRANSFORMS_PATH: "/app"
     ports:
       - 1234:1234
     depends_on:
