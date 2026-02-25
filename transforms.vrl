@@ -1,6 +1,6 @@
 inserted_at =  .timestamp
 .message = strip_ansi_escape_codes!(.message)
-., err = parse_regex(.message,r'(?<requested_at>^\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\.\d{9} .\d{4} CET) \[(?<container>[\w\d\-]*)\]\W+(?<message>.*)')
+., err = parse_regex(.message,r'(?<ts>^\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\.\d{9} .\d{4} CET) \[(?<container>[\w\d\-]*)\]\W+(?<message>.*)')
 .inserted_at = inserted_at
 
 if err != null {
@@ -13,7 +13,7 @@ if err != null {
 # Parse parts split by " | "
 message_parts = split(.message, " | ")
 .message = message_parts[0]
-.requested_at =  parse_timestamp!(.requested_at,"%Y-%m-%d %H:%M:%S%.9f %z CET")
+.ts =  parse_timestamp!(.ts,"%Y-%m-%d %H:%M:%S%.9f %z CET")
 if message_parts[1] != null {
     .service = parse_regex(message_parts[1], r'Service\((?<service>[\w\d\-]*)\)').service ?? null
 }
