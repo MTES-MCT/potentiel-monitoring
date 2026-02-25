@@ -1,2 +1,1 @@
-tcp: bash ./start.sh
-web: 
+tcp: vector --config vector.toml
