@@ -16,10 +16,10 @@ inputs = ["http","file"]
 
 
 # useful for debugging locally
-# [sinks.console]
-# type = "console"
-# encoding.codec = "json"
-# inputs = ["parse_logs"]
+[sinks.console]
+type = "console"
+encoding.codec = "json"
+inputs = ["parse_logs"]
 
 [sinks.timescaledb]
 type = "postgres"
