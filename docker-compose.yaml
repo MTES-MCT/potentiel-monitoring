@@ -43,7 +43,7 @@ services:
     command: ["--config","/etc/vector/custom/vector.toml"]
     volumes:
       - ./vector.toml:/etc/vector/custom/vector.toml:ro
-      - ./transforms.vrl:/etc/vector/custom/transforms.vrl:ro
+      - ./transforms.vrl:/etc/vector/transforms.vrl:ro
       # - ./logs:/var/logs:ro
     environment:
       VECTOR_DB_URL: "postgres://postgres@log_db:5432/postgres"
