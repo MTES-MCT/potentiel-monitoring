@@ -1,1 +1,1 @@
-tcp: bin/vector --config vector.toml
+web: bin/vector --config vector.toml
