@@ -1,9 +1,8 @@
 data_dir = "/tmp"
 
-[sources.syslog]
-type = "syslog"
-address = "0.0.0.0:${VECTOR_PORT}"
-mode = "tcp"
+[sources.http]
+type = "http_server"
+address= "0.0.0.0:${VECTOR_PORT}"
 
 # useful for debugging locally
 #[sources.file]
@@ -13,7 +12,8 @@ mode = "tcp"
 [transforms.parse_logs]
 type= "remap"
 file = "/app/transforms.vrl"
-inputs = ["syslog"]
+inputs = ["http"]
+
 
 # useful for debugging locally
 [sinks.console]
