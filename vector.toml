@@ -3,6 +3,9 @@ data_dir = "/tmp"
 [sources.http]
 type = "http_server"
 address= "0.0.0.0:${VECTOR_PORT}"
+auth.strategy="basic"
+auth.username="${VECTOR_USERNAME}"
+auth.password="${VECTOR_PASSWORD}"
 
 # useful for debugging locally
 #[sources.file]
