@@ -1,33 +1,51 @@
-inserted_at =  .timestamp
-.message = strip_ansi_escape_codes!(.message)
-., err = parse_regex(.message,r'(?<ts>^\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\.\d{9} .\d{4} CET) \[(?<container>[\w\d\-]*)\]\W+(?<message>.*)')
-.inserted_at = inserted_at
+.inserted_at = .timestamp
 
-if err != null {
-    log("Parse error: " + string!(err)+" Message: "+ string!(.message), level: "error",)
+# Normalize message to a string before any regex operations.
+.message = to_string(.message) ?? ""
+.message = strip_ansi_escape_codes(.message)
+
+header, header_err = parse_regex(.message, r'(?<ts>^\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\.\d{9} [+-]\d{4})(?: [A-Z]{3,4})? \[(?<container>[\w\d\-]*)\]\W+(?<message>.*)')
+if header_err == null && header != null {
+    .ts = parse_timestamp(header.ts, "%Y-%m-%d %H:%M:%S%.9f %z") ?? .inserted_at
+    .container = header.container
+    if header.message != null {
+        .message = header.message
+    }
+} else {
+    .ts = .inserted_at
 }
 
-# Parse log with level and message
-. |= parse_regex!(.message,r'(?<level>debug|info|error|warn)?:?\W*(?<message>.*)')
+# Parse log with level and message.
+level_parts = parse_regex(.message, r'(?<level>debug|info|error|warn)?:?\W*(?<message>.*)') ?? {}
+.level = level_parts.level
+if level_parts.message != null {
+    .message = level_parts.message
+}
 
-# Parse parts split by " | "
-message_parts = split(.message, " | ")
-.message = message_parts[0]
-.ts =  parse_timestamp!(.ts,"%Y-%m-%d %H:%M:%S%.9f %z CET")
+# Parse parts split by " | ".
+message_value = string!(.message)
+message_parts = split(message_value, " | ")
+if message_parts[0] != null {
+    .message = message_parts[0]
+}
+
 if message_parts[1] != null {
-    .service = parse_regex(message_parts[1], r'Service\((?<service>[\w\d\-]*)\)').service ?? null
+    service_match = parse_regex(message_parts[1], r'Service\((?<service>[\w\d\-]*)\)') ?? {}
+    .service = service_match.service
 }
 
 if message_parts[2] != null {
-    .meta = parse_json(parse_regex(message_parts[2], r'Metadata\((?<meta>.*)\)').meta ?? {}) ?? null
-} 
-
+    meta_match = parse_regex(message_parts[2], r'Metadata\((?<meta>.*)\)') ?? {}
+    if meta_match.meta != null {
+        .meta = parse_json(meta_match.meta) ?? null
+    }
+}
 
 if .level == null {
-    # Parse HTTP request logs
-    http,err = parse_regex(.message, r'(?<method>GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) (?<endpoint>/[^\s]*)\W*(?<status>\d{3})?.*(?<durationMS>\d+\.\d+)? ms')
+    # Parse HTTP request logs.
+    http, http_err = parse_regex(.message, r'(?<method>GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) (?<endpoint>/[^\s]*)\W*(?<status>\d{3})?.*(?<durationMS>\d+\.\d+)? ms')
 
-    if err == null {
+    if http_err == null && http != null {
         .level = "http"
         .meta = http
     }
