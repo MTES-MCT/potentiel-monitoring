@@ -16,6 +16,8 @@ auth.password="${VECTOR_PASSWORD}"
 type= "remap"
 file = "/app/transforms.vrl"
 inputs = ["http"]
+# useful for debugging locally
+# inputs = ["http", "file"]
 
 
 # useful for debugging locally

@@ -41,3 +41,37 @@ Un jeu de tests unitaires Vector est disponible pour valider `transforms.vrl`.
 ```
 
 Ce script exécute `vector test` dans l'image Docker utilisée par le projet et lance les cas définis dans `tests/vector-tests.yaml`.
+
+
+## Tester sur des logs réels
+- si nécessaire, stopper et supprimer les containers 
+```bash
+docker compose down
+```
+
+- Télécharger des logs de Scalingo (NB : le script ci dessous télécharge TOUS les logs dispo, adapter le script aux besoins)
+
+```bash
+APP_NAME=potentiel-production
+mkdir logs && cd logs
+
+# download the current logs
+scalingo logs --lines 1000000 --app $APP_NAME  --region osc-secnum-fr1 > logs/last
+
+# download all log archives
+scalingo logs-archives --app $APP_NAME --region osc-secnum-fr1 | grep Url | cut -c 7- | xargs wget
+
+# cleanup file names
+for f in *.gz*; do mv -- "$f" "${f%%.gz*}.gz"; done
+
+# unzip all log archives
+for f in *.gz; do gzip -d $f; done
+```
+
+- Ajouter la source "file" dans vector.toml (décommenter les sections concernées, ne pas oublier `inputs` sous `transforms.parse_logs`)
+- Ajouter le dossier de logs au docker-compose : `- ./logs:/var/logs:ro`
+- Démarrer la stack
+```bash
+docker compose up -d
+```
+- Si tout va bien, les logs devraient être ingérés en quelques minutes. Si non, debugger les logs de vector (container `log_vector`)
