@@ -31,3 +31,13 @@ Chaque commit sur `main` met à jour l'application.
 Pour mettre à jour Postgres, voir la documentation de Scalingo.
 
 Pour mettre à jour Vector, mettre à jour le buildpack (cf [.buildpacks](.buildpacks))
+
+## Tester les transformations VRL
+
+Un jeu de tests unitaires Vector est disponible pour valider `transforms.vrl`.
+
+```bash
+./test-vrl.sh
+```
+
+Ce script exécute `vector test` dans l'image Docker utilisée par le projet et lance les cas définis dans `tests/vector-tests.yaml`.
