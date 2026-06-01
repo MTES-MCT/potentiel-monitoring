@@ -4,7 +4,7 @@
 .message = to_string(.message) ?? ""
 .message = strip_ansi_escape_codes(.message)
 # Also strip escaped ANSI code representations (e.g., \\u001b[34m becomes nothing)
-.message = replace!(.message, r'\\u001b\[[0-9;]*m', "")
+.message = replace(.message, r'\\u001b\[[0-9;]*m', "")
 
 # Detect error block patterns for proper classification
 .is_error_start = starts_with(.message, "Error:")
@@ -70,6 +70,7 @@ if .level == null {
     if http_err == null && http != null {
         .level = "http"
         .meta = http
+        .message = ""
         if http.durationMS != null {
             .meta.durationMS = to_int!(http.durationMS)
         }
@@ -80,6 +81,7 @@ if .level == null {
             .level = "http"
             .meta = http_kv
             .meta.source = "scalingo"
+            .message = ""
             if http_kv.container != null {
                 .container = http_kv.container
             }

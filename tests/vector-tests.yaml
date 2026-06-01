@@ -34,6 +34,7 @@ tests:
               assert_eq!(.level, "http")
               assert_eq!(.meta.method, "GET")
               assert_eq!(.meta.endpoint, "/auth/signIn?_rsc=xxx")
+              assert_eq!(.meta.message, null)
               assert_eq!(.meta.status, "200")
               assert_eq!(.meta.durationMS, 7)
 
@@ -53,6 +54,7 @@ tests:
               assert_eq!(.meta.method, "GET")
               assert_eq!(.meta.endpoint, "/health")
               assert_eq!(.meta.status, "200")
+              assert_eq!(.meta.message, null)
               assert_eq!(.meta.request_id, "c0c81ef5-cf36-4184-9404-0f368f372f92")
               assert_eq!(.meta.host, "sub.domain.com")
               assert_eq!(.meta.protocol, "https")
