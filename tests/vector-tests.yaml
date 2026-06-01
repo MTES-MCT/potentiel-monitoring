@@ -19,6 +19,22 @@ tests:
               assert!(is_timestamp(.ts))
               assert_eq!(.ts,timestamp(t'2026-05-09T00:00:02.979685252+02:00'))
 
+  - name: parse structured app log with ANSI-colored level
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          colored_level = parse_json!("\"\\u001b[34mdebug\\u001b[0m\"")
+          .message = "2026-05-09 00:00:02.979685252 +0200 CEST [web-1] " + string!(colored_level) + ":   Executing message"
+          .timestamp = now()
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              assert_eq!(.level, "debug")
+              assert_eq!(.message, "Executing message")
+
   - name: parse app HTTP log when no level is present
     inputs:
       - insert_at: parse_logs
