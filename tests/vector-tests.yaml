@@ -1,0 +1,126 @@
+tests:
+  - name: parse structured app log
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          .message = "2026-05-09 00:00:02.979685252 +0200 CEST [web-1] debug:   Executing message | Service(auth-api) | Metadata({\"message\":\"{\\\"type\\\":\\\"System.Utilisateur.Query.TrouverUtilisateur\\\",\\\"data\\\":{\\\"identifiantUtilisateur\\\":\\\"id@user\\\"}}\",\"correlationId\":\"abc\"})"
+          .timestamp = now()
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              assert_eq!(.container, "web-1")
+              assert_eq!(.level, "debug")
+              assert_eq!(.message, "Executing message")
+              assert_eq!(.service, "auth-api")
+              assert_eq!(.meta.correlationId, "abc")
+              assert!(is_timestamp(.ts))
+              assert_eq!(.ts,timestamp(t'2026-05-09T00:00:02.979685252+02:00'))
+
+  - name: parse app HTTP log when no level is present
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          .message = "GET /auth/signIn?_rsc=xxx - 200 - 7ms"
+          .timestamp = now()
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              assert_eq!(.level, "http")
+              assert_eq!(.meta.method, "GET")
+              assert_eq!(.meta.endpoint, "/auth/signIn?_rsc=xxx")
+              assert_eq!(.meta.status, "200")
+              assert_eq!(.meta.durationMS, 7)
+
+  - name: parse Scalingo HTTP log when no level is present
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          .message = "method=GET path=\"/health\" host=sub.domain.com request_id=c0c81ef5-cf36-4184-9404-0f368f372f92 container=web-1 from=\"12.12.123.123\" protocol=https status=200 duration=0.013s bytes=1325 referer=\"-\" user_agent=\"updown.io daemon 2.11\""
+          .timestamp = now()
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              assert_eq!(.level, "http")
+              assert_eq!(.meta.method, "GET")
+              assert_eq!(.meta.endpoint, "/health")
+              assert_eq!(.meta.status, "200")
+              assert_eq!(.meta.request_id, "c0c81ef5-cf36-4184-9404-0f368f372f92")
+              assert_eq!(.meta.host, "sub.domain.com")
+              assert_eq!(.meta.protocol, "https")
+              assert_eq!(.meta.duration, "0.013s")
+              assert_eq!(.meta.user_agent, "updown.io daemon 2.11")
+              assert_eq!(.container, "web-1")
+              assert!(is_nullish(.meta.durationMS))
+
+  - name: do not parse HTTP metadata when level already exists
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          .message = "info: GET /health 200 12.34 ms"
+          .timestamp = now()
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              assert_eq!(.level, "info")
+              assert!(!exists(.meta.method))
+
+  - name: detect error line from JS stack trace
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          .message = "at i (.next/server/chunks/ssr/_10nmn~_._.js:1:214)"
+          .timestamp = now()
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              assert_eq!(.level, "error")
+
+  - name: multi-line JS error block (error start)
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          .message = "Error: Authentification obligatoire"
+          .timestamp = now()
+          .container = "web-1"
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              assert_eq!(.level, "error")
+              assert_eq!(.container, "web-1")
+              assert!(contains(string!(.message), "Authentification"))
+
+  - name: multi-line JS error block (stack trace - emitted as separate event)
+    inputs:
+      - insert_at: parse_logs
+        type: vrl
+        source: |
+          .message = "at i (.next/server/chunks/ssr/_10nmn~_._.js:1:214) {"
+          .timestamp = now()
+          .container = "web-1"
+    outputs:
+      - extract_from: parse_logs
+        conditions:
+          - type: vrl
+            source: |
+              # Each line is classified as error but emitted separately
+              # Group them in queries using: WHERE container='web-1' AND level='error' AND ts within same second
+              assert_eq!(.level, "error")
+              assert_eq!(.container, "web-1")

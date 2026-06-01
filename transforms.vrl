@@ -3,6 +3,14 @@
 # Normalize message to a string before any regex operations.
 .message = to_string(.message) ?? ""
 .message = strip_ansi_escape_codes(.message)
+# Also strip escaped ANSI code representations (e.g., \\u001b[34m becomes nothing)
+.message = replace!(.message, r'\\u001b\[[0-9;]*m', "")
+
+# Detect error block patterns for proper classification
+.is_error_start = starts_with(.message, "Error:")
+.is_error_stack = starts_with(.message, "at ") && (contains(.message, ".js:") || contains(.message, ".ts:"))
+.is_error_property = (starts_with(.message, "digest:") || (contains(.message, ":") && !contains(.message, "://"))) && !.is_error_start && !.is_error_stack
+.is_empty_line = .message == ""
 
 header, header_err = parse_regex(.message, r'(?<ts>^\d{4}-\d{2}-\d{2} \d\d:\d\d:\d\d\.\d{9} [+-]\d{4})(?: [A-Z]{3,4})? \[(?<container>[\w\d\-]*)\]\W+(?<message>.*)')
 if header_err == null && header != null {
@@ -20,6 +28,20 @@ level_parts = parse_regex(.message, r'(?<level>debug|info|error|warn)?:?\W*(?<me
 .level = level_parts.level
 if level_parts.message != null {
     .message = level_parts.message
+}
+
+# Set level for detected error components
+if .is_error_start && .level == null {
+    .level = "error"
+}
+
+if (.is_error_stack || .is_error_property) && .level == null {
+    .level = "error"
+}
+
+# For empty lines in error blocks, drop them to reduce noise
+if .is_empty_line {
+    abort
 }
 
 # Parse parts split by " | ".
@@ -42,11 +64,31 @@ if message_parts[2] != null {
 }
 
 if .level == null {
-    # Parse HTTP request logs.
-    http, http_err = parse_regex(.message, r'(?<method>GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) (?<endpoint>/[^\s]*)\W*(?<status>\d{3})?.*(?<durationMS>\d+\.\d+)? ms')
+    # Parse HTTP request logs (app format: METHOD /endpoint - STATUS - DURATIONms).
+    http, http_err = parse_regex(.message, r'(?<method>GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD) (?<endpoint>/[^\s]+)\s+-\s+(?<status>\d{3})\s+-\s+(?<durationMS>\d+)')
 
     if http_err == null && http != null {
         .level = "http"
         .meta = http
+        if http.durationMS != null {
+            .meta.durationMS = to_int!(http.durationMS)
+        }
+    } else {
+        # Parse HTTP request logs (key=value format, from scalingo).
+        http_kv, http_kv_err = parse_regex(.message, r'method=(?<method>GET|POST|PUT|DELETE|PATCH|OPTIONS|HEAD)\s+path="(?<endpoint>/[^"]*)"\s+host=(?<host>\S+)\s+request_id=(?<request_id>\S+)\s+container=(?<container>\S+)\s+from="(?<from>[^"]*)"\s+protocol=(?<protocol>\S+)\s+status=(?<status>\d+)\s+duration=(?<duration>\S+)\s+bytes=(?<bytes>\S+)\s+referer="(?<referer>[^"]*)"\s+user_agent="(?<user_agent>[^"]*)"')
+        if http_kv_err == null && http_kv != null {
+            .level = "http"
+            .meta = http_kv
+            .meta.source = "scalingo"
+            if http_kv.container != null {
+                .container = http_kv.container
+            }
+        } else {
+            # Detect stack trace lines (part of multi-line JS errors).
+            # Note: These are emitted as separate events. Use container + timestamp to group in queries.
+            if contains(string!(.message), "at ") && (contains(string!(.message), ".js:") || contains(string!(.message), ".ts:")) {
+                .level = "error"
+            }
+        }
     }
 }
