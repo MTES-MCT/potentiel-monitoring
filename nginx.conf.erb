@@ -1,5 +1,4 @@
 # Route log ingestion to Vector, and all other traffic to Grafana.
-# Backend URLs should point to process types (`vector` and `grafana`) on Scalingo.
 
 location /vector {
   proxy_http_version 1.1;
@@ -8,7 +7,7 @@ location /vector {
   proxy_set_header X-Forwarded-Proto $scheme;
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Authorization $http_authorization;
-  proxy_pass <%= ENV['VECTOR_BACKEND_URL'] %>;
+  proxy_pass http://127.0.0.1:<%= ENV['VECTOR_INTERNAL_PORT'] || '9001' %>;
 }
 
 location / {
@@ -19,5 +18,5 @@ location / {
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
-  proxy_pass <%= ENV['GRAFANA_BACKEND_URL'] %>;
+  proxy_pass http://127.0.0.1:<%= ENV['GRAFANA_INTERNAL_PORT'] || '9002' %>;
 }
