@@ -1,0 +1,16 @@
+apiVersion: 1
+
+datasources:
+  - name: Potentiel DB
+    uid: potentiel-db
+    type: postgres
+    url: log_db:5432
+    user: postgres
+    jsonData:
+      database: postgres
+      sslmode: disable
+      postgresVersion: 1500
+      timescaledb: true
+    secureJsonData: {}
+    isDefault: true
+    editable: false

@@ -1,0 +1,536 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "description": "Application logs from Potentiel",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "potentiel-db"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "thresholds"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "blue",
+                                "value": null
+                            }
+                        ]
+                    },
+                    "unit": "none"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 0,
+                "y": 0
+            },
+            "id": 1,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Total Logs",
+            "type": "stat",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "potentiel-db"
+                    },
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT count(*) AS total FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN ($level)) AND ('${service:csv}' = '' OR service IN ($service))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "potentiel-db"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "red",
+                        "mode": "fixed"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "red",
+                                "value": 1
+                            }
+                        ]
+                    },
+                    "unit": "none"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 6,
+                "y": 0
+            },
+            "id": 2,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Errors",
+            "type": "stat",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "potentiel-db"
+                    },
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT count(*) AS errors FROM logs WHERE $__timeFilter(ts) AND level = 'error' AND ('${service:csv}' = '' OR service IN ($service))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "potentiel-db"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "fixedColor": "orange",
+                        "mode": "fixed"
+                    },
+                    "thresholds": {
+                        "mode": "absolute",
+                        "steps": [
+                            {
+                                "color": "green",
+                                "value": null
+                            },
+                            {
+                                "color": "orange",
+                                "value": 1
+                            }
+                        ]
+                    },
+                    "unit": "none"
+                },
+                "overrides": []
+            },
+            "gridPos": {
+                "h": 4,
+                "w": 6,
+                "x": 12,
+                "y": 0
+            },
+            "id": 3,
+            "options": {
+                "colorMode": "background",
+                "graphMode": "none",
+                "justifyMode": "center",
+                "orientation": "auto",
+                "reduceOptions": {
+                    "calcs": [
+                        "lastNotNull"
+                    ],
+                    "fields": "",
+                    "values": false
+                },
+                "textMode": "auto"
+            },
+            "title": "Warnings",
+            "type": "stat",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "potentiel-db"
+                    },
+                    "format": "table",
+                    "rawQuery": true,
+                    "rawSql": "SELECT count(*) AS warnings FROM logs WHERE $__timeFilter(ts) AND level = 'warn' AND ('${service:csv}' = '' OR service IN ($service))",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "datasource": {
+                "type": "postgres",
+                "uid": "potentiel-db"
+            },
+            "fieldConfig": {
+                "defaults": {
+                    "color": {
+                        "mode": "palette-classic"
+                    },
+                    "custom": {
+                        "fillOpacity": 20,
+                        "lineWidth": 1,
+                        "spanNulls": false,
+                        "stacking": {
+                            "group": "A",
+                            "mode": "normal"
+                        }
+                    }
+                },
+                "overrides": [
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "error"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "red",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "warn"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "orange",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "info"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "green",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "debug"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "gray",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    },
+                    {
+                        "matcher": {
+                            "id": "byName",
+                            "options": "http"
+                        },
+                        "properties": [
+                            {
+                                "id": "color",
+                                "value": {
+                                    "fixedColor": "blue",
+                                    "mode": "fixed"
+                                }
+                            }
+                        ]
+                    }
+                ]
+            },
+            "gridPos": {
+                "h": 8,
+                "w": 24,
+                "x": 0,
+                "y": 4
+            },
+            "id": 4,
+            "options": {
+                "legend": {
+                    "calcs": [
+                        "sum"
+                    ],
+                    "displayMode": "list",
+                    "placement": "bottom"
+                },
+                "tooltip": {
+                    "mode": "multi",
+                    "sort": "desc"
+                }
+            },
+            "title": "Log volume over time",
+            "type": "timeseries",
+            "targets": [
+                {
+                    "datasource": {
+                        "type": "postgres",
+                        "uid": "potentiel-db"
+                    },
+                    "format": "time_series",
+                    "rawQuery": true,
+                    "rawSql": "SELECT $__timeGroupAlias(ts,$__interval), count(*) FILTER (WHERE level = 'error') AS \"error\", count(*) FILTER (WHERE level = 'warn') AS \"warn\", count(*) FILTER (WHERE level = 'info') AS \"info\", count(*) FILTER (WHERE level = 'http') AS \"http\", count(*) FILTER (WHERE level = 'debug') AS \"debug\" FROM logs WHERE $__timeFilter(ts) AND ('${service:csv}' = '' OR service IN ($service)) GROUP BY 1 ORDER BY 1",
+                    "refId": "A"
+                }
+            ]
+        },
+        {
+            "id": 5,
+            "type": "logs",
+            "title": "Logs",
+            "gridPos": {
+                "h": 16,
+                "w": 24,
+                "x": 0,
+                "y": 12
+            },
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+            },
+            "pluginVersion": "12.4.3+security-02",
+            "targets": [
+                {
+                    "refId": "A",
+                    "format": "table",
+                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) LIMIT 50 ",
+                    "editorMode": "builder",
+                    "sql": {
+                        "columns": [
+                            {
+                                "type": "function",
+                                "parameters": [
+                                    {
+                                        "type": "functionParameter",
+                                        "name": "ts"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "function",
+                                "parameters": [
+                                    {
+                                        "type": "functionParameter",
+                                        "name": "message"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "function",
+                                "parameters": [
+                                    {
+                                        "type": "functionParameter",
+                                        "name": "meta"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "function",
+                                "parameters": [
+                                    {
+                                        "type": "functionParameter",
+                                        "name": "level"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "function",
+                                "parameters": [
+                                    {
+                                        "type": "functionParameter",
+                                        "name": "service"
+                                    }
+                                ]
+                            }
+                        ],
+                        "groupBy": [
+                            {
+                                "type": "groupBy",
+                                "property": {
+                                    "type": "string"
+                                }
+                            }
+                        ],
+                        "limit": 50,
+                        "whereJsonTree": {
+                            "id": "ba98baa9-0123-4456-b89a-b19e87ba81f4",
+                            "type": "group",
+                            "children1": [
+                                {
+                                    "type": "rule",
+                                    "id": "bababba9-89ab-4cde-b012-319e87c3bbc2",
+                                    "properties": {
+                                        "fieldSrc": "field",
+                                        "field": "ts",
+                                        "operator": "macros",
+                                        "value": [
+                                            "timeFilter"
+                                        ],
+                                        "valueSrc": [
+                                            "value"
+                                        ],
+                                        "valueType": [
+                                            "datetime"
+                                        ],
+                                        "valueError": [
+                                            null
+                                        ]
+                                    }
+                                }
+                            ]
+                        },
+                        "whereString": "$__timeFilter(ts)"
+                    },
+                    "dataset": "postgres",
+                    "table": "logs",
+                    "datasource": {
+                        "type": "grafana-postgresql-datasource",
+                        "uid": "potentiel-db"
+                    }
+                }
+            ],
+            "datasource": {
+                "uid": "potentiel-db",
+                "type": "grafana-postgresql-datasource"
+            },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": true,
+                "unwrappedColumns": false,
+                "enableLogDetails": true,
+                "enableInfiniteScrolling": true,
+                "showControls": false,
+                "dedupStrategy": "none",
+                "sortOrder": "Descending",
+                "showLabels": false,
+                "timestampResolution": "ms",
+                "prettifyLogMessage": true,
+                "syntaxHighlighting": true,
+                "detailsMode": "sidebar",
+                "fontSize": "small"
+            }
+        }
+    ],
+    "refresh": "30s",
+    "schemaVersion": 38,
+    "tags": [
+        "logs",
+        "potentiel"
+    ],
+    "templating": {
+        "list": [
+            {
+                "current": {},
+                "datasource": {
+                    "type": "postgres",
+                    "uid": "potentiel-db"
+                },
+                "definition": "SELECT DISTINCT level FROM logs WHERE level IS NOT NULL ORDER BY level",
+                "hide": 0,
+                "includeAll": true,
+                "label": "Level",
+                "multi": true,
+                "name": "level",
+                "options": [],
+                "query": "SELECT DISTINCT level FROM logs WHERE level IS NOT NULL ORDER BY level",
+                "refresh": 2,
+                "sort": 1,
+                "type": "query"
+            },
+            {
+                "current": {},
+                "datasource": {
+                    "type": "postgres",
+                    "uid": "potentiel-db"
+                },
+                "definition": "SELECT DISTINCT service FROM logs WHERE service IS NOT NULL ORDER BY service",
+                "hide": 0,
+                "includeAll": true,
+                "label": "Service",
+                "multi": true,
+                "name": "service",
+                "options": [],
+                "query": "SELECT DISTINCT service FROM logs WHERE service IS NOT NULL ORDER BY service",
+                "refresh": 2,
+                "sort": 1,
+                "type": "query"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-3h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Application Logs",
+    "uid": "potentiel-logs",
+    "version": 1
+}

@@ -10,15 +10,14 @@ services:
     ports:
       - 5437:5432
   grafana:
-    image: grafana/grafana:latest
+    image: grafana/grafana:12.4.3-security-02-ubuntu
     container_name: log_grafana
     ports:
       - "4242:3000"
     environment:
       - GF_SECURITY_ADMIN_USER=admin
       - GF_SECURITY_ADMIN_PASSWORD=admin
-      # volumes:
-      # - grafana_data:/var/lib/grafana
+    volumes:
       - ./grafana/provisioning:/etc/grafana/provisioning
     depends_on:
       - db
