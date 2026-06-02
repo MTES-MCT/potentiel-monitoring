@@ -7,7 +7,7 @@ location /vector {
   proxy_set_header X-Forwarded-Proto $scheme;
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Authorization $http_authorization;
-  proxy_pass http://127.0.0.1:<%= ENV['VECTOR_INTERNAL_PORT'] || '9001' %>;
+  proxy_pass http://vector:<%= ENV['VECTOR_INTERNAL_PORT'] || '9001' %>;
 }
 
 location / {
@@ -18,5 +18,5 @@ location / {
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
-  proxy_pass http://127.0.0.1:<%= ENV['GRAFANA_INTERNAL_PORT'] || '9002' %>;
+  proxy_pass http://grafana:<%= ENV['GRAFANA_INTERNAL_PORT'] || '9002' %>;
 }
