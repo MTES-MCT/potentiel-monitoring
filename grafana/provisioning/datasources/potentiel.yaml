@@ -4,11 +4,11 @@ datasources:
   - name: Potentiel DB
     uid: potentiel-db
     type: postgres
-    url: log_db:5432
-    user: postgres
+    url: ${LOG_DB_HOST:log_db}:${LOG_DB_PORT:5432}
+    user: ${LOG_DB_USER:postgres}
     jsonData:
-      database: postgres
-      sslmode: disable
+      database: ${LOG_DB_NAME:postgres}
+      sslmode: ${LOG_DB_SSLMODE:disable}
       postgresVersion: 1500
       timescaledb: true
     secureJsonData: {}
