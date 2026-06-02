@@ -1,3 +1,4 @@
-web: bin/run
+#web: bin/run
 vector: bin/vector --config vector.toml
-grafana: grafana server
+#grafana: grafana server
+web: grafana server
