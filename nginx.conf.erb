@@ -7,7 +7,7 @@ location /vector {
   proxy_set_header X-Forwarded-Proto $scheme;
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Authorization $http_authorization;
-  proxy_pass vector.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal::<%= ENV['VECTOR_INTERNAL_PORT'] || '9001' %>;
+  proxy_pass vector.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal:<%= ENV['VECTOR_INTERNAL_PORT'] || '9001' %>;
 }
 
 location / {
@@ -18,5 +18,5 @@ location / {
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
-  proxy_pass grafana.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal::<%= ENV['GRAFANA_INTERNAL_PORT'] || '9002' %>;
+  proxy_pass grafana.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal:<%= ENV['GRAFANA_INTERNAL_PORT'] || '9002' %>;
 }
