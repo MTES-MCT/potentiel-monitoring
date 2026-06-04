@@ -11,6 +11,7 @@ datasources:
       sslmode: ${LOG_DB_SSLMODE:disable}
       postgresVersion: 1500
       timescaledb: true
-    secureJsonData: {}
+    secureJsonData:
+      password: ${LOG_DB_PASSWORD:password}
     isDefault: true
     editable: false
