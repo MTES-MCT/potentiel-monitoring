@@ -360,99 +360,31 @@
                 {
                     "refId": "A",
                     "format": "table",
-                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) LIMIT 50 ",
-                    "editorMode": "builder",
-                    "sql": {
-                        "columns": [
-                            {
-                                "type": "function",
-                                "parameters": [
-                                    {
-                                        "type": "functionParameter",
-                                        "name": "ts"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "function",
-                                "parameters": [
-                                    {
-                                        "type": "functionParameter",
-                                        "name": "message"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "function",
-                                "parameters": [
-                                    {
-                                        "type": "functionParameter",
-                                        "name": "meta"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "function",
-                                "parameters": [
-                                    {
-                                        "type": "functionParameter",
-                                        "name": "level"
-                                    }
-                                ]
-                            },
-                            {
-                                "type": "function",
-                                "parameters": [
-                                    {
-                                        "type": "functionParameter",
-                                        "name": "service"
-                                    }
-                                ]
-                            }
-                        ],
-                        "groupBy": [
-                            {
-                                "type": "groupBy",
-                                "property": {
-                                    "type": "string"
-                                }
-                            }
-                        ],
-                        "limit": 50,
-                        "whereJsonTree": {
-                            "id": "ba98baa9-0123-4456-b89a-b19e87ba81f4",
-                            "type": "group",
-                            "children1": [
-                                {
-                                    "type": "rule",
-                                    "id": "bababba9-89ab-4cde-b012-319e87c3bbc2",
-                                    "properties": {
-                                        "fieldSrc": "field",
-                                        "field": "ts",
-                                        "operator": "macros",
-                                        "value": [
-                                            "timeFilter"
-                                        ],
-                                        "valueSrc": [
-                                            "value"
-                                        ],
-                                        "valueType": [
-                                            "datetime"
-                                        ],
-                                        "valueError": [
-                                            null
-                                        ]
-                                    }
-                                }
-                            ]
-                        },
-                        "whereString": "$__timeFilter(ts)"
-                    },
-                    "dataset": "postgres",
+                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN ($level)) AND ('${service:csv}' = '' OR service IN ($service)) LIMIT 50 ",
                     "table": "logs",
                     "datasource": {
                         "type": "grafana-postgresql-datasource",
                         "uid": "potentiel-db"
+                    }
+                }
+            ],
+            "transformations": [
+                {
+                    "id": "extractFields",
+                    "options": {
+                        "delimiter": ",",
+                        "format": "json",
+                        "jsonPaths": [
+                            {
+                                "path": "correlationId"
+                            },
+                            {
+                                "path": "messageType"
+                            }
+                        ],
+                        "keepTime": false,
+                        "replace": false,
+                        "source": "meta"
                     }
                 }
             ],
