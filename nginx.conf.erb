@@ -1,4 +1,17 @@
 # Route log ingestion to Vector, and all other traffic to Grafana.
+<%
+dns_resolver =
+  ENV['NGINX_DNS_RESOLVER'] ||
+  File.readlines('/etc/resolv.conf')
+    .map { |line| line[/^\s*nameserver\s+([^\s#]+)/, 1] }
+    .compact
+    .first ||
+  '127.0.0.11'
+%>
+
+# Re-resolve private-network DNS names regularly so upstream dyno IP changes
+# do not require restarting nginx after a deployment.
+resolver <%= dns_resolver %> valid=<%= ENV['NGINX_DNS_VALID'] || '10s' %> ipv6=off;
 
 location /vector {
   proxy_http_version 1.1;

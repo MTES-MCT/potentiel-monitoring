@@ -1,0 +1,148 @@
+{
+    "annotations": {
+        "list": [
+            {
+                "builtIn": 1,
+                "datasource": {
+                    "type": "grafana",
+                    "uid": "-- Grafana --"
+                },
+                "enable": true,
+                "hide": true,
+                "iconColor": "rgba(0, 211, 255, 1)",
+                "name": "Annotations & Alerts",
+                "type": "dashboard"
+            }
+        ]
+    },
+    "description": "Reusable logs panel only",
+    "editable": true,
+    "fiscalYearStartMonth": 0,
+    "graphTooltip": 0,
+    "links": [],
+    "panels": [
+        {
+            "id": 1,
+            "type": "logs",
+            "title": "Logs",
+            "gridPos": {
+                "h": 24,
+                "w": 24,
+                "x": 0,
+                "y": 0
+            },
+            "fieldConfig": {
+                "defaults": {},
+                "overrides": []
+            },
+            "pluginVersion": "12.4.3+security-02",
+            "targets": [
+                {
+                    "refId": "A",
+                    "format": "table",
+                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN ($level)) AND ('${service:csv}' = '' OR service IN ($service)) LIMIT 50 ",
+                    "table": "logs",
+                    "datasource": {
+                        "type": "grafana-postgresql-datasource",
+                        "uid": "potentiel-db"
+                    }
+                }
+            ],
+            "transformations": [
+                {
+                    "id": "extractFields",
+                    "options": {
+                        "delimiter": ",",
+                        "format": "json",
+                        "jsonPaths": [
+                            {
+                                "path": "correlationId"
+                            },
+                            {
+                                "path": "messageType"
+                            }
+                        ],
+                        "keepTime": false,
+                        "replace": false,
+                        "source": "meta"
+                    }
+                }
+            ],
+            "datasource": {
+                "uid": "potentiel-db",
+                "type": "grafana-postgresql-datasource"
+            },
+            "options": {
+                "showTime": true,
+                "wrapLogMessage": true,
+                "unwrappedColumns": false,
+                "enableLogDetails": true,
+                "enableInfiniteScrolling": true,
+                "showControls": false,
+                "dedupStrategy": "none",
+                "sortOrder": "Descending",
+                "showLabels": false,
+                "timestampResolution": "ms",
+                "prettifyLogMessage": true,
+                "syntaxHighlighting": true,
+                "detailsMode": "sidebar",
+                "fontSize": "small"
+            }
+        }
+    ],
+    "refresh": "30s",
+    "schemaVersion": 38,
+    "tags": [
+        "logs",
+        "potentiel"
+    ],
+    "templating": {
+        "list": [
+            {
+                "current": {},
+                "datasource": {
+                    "type": "postgres",
+                    "uid": "potentiel-db"
+                },
+                "definition": "SELECT DISTINCT level FROM logs WHERE level IS NOT NULL ORDER BY level",
+                "hide": 0,
+                "includeAll": true,
+                "label": "Level",
+                "multi": true,
+                "name": "level",
+                "options": [],
+                "query": "SELECT DISTINCT level FROM logs WHERE level IS NOT NULL ORDER BY level",
+                "refresh": 2,
+                "sort": 1,
+                "type": "query"
+            },
+            {
+                "current": {},
+                "datasource": {
+                    "type": "postgres",
+                    "uid": "potentiel-db"
+                },
+                "definition": "SELECT DISTINCT service FROM logs WHERE service IS NOT NULL ORDER BY service",
+                "hide": 0,
+                "includeAll": true,
+                "label": "Service",
+                "multi": true,
+                "name": "service",
+                "options": [],
+                "query": "SELECT DISTINCT service FROM logs WHERE service IS NOT NULL ORDER BY service",
+                "refresh": 2,
+                "sort": 1,
+                "type": "query"
+            }
+        ]
+    },
+    "time": {
+        "from": "now-3h",
+        "to": "now"
+    },
+    "timepicker": {},
+    "timezone": "browser",
+    "title": "Logs View",
+    "uid": "potentiel-logs-view-only",
+    "version": 1
+}
