@@ -224,8 +224,8 @@
             "gridPos": {
                 "h": 4,
                 "w": 6,
-                "x": 18,
-                "y": 0
+                "x": 0,
+                "y": 4
             },
             "id": 4,
             "options": {
@@ -237,7 +237,7 @@
                     "calcs": [
                         "lastNotNull"
                     ],
-                    "fields": "",
+                    "fields": "/^oldest_log$/",
                     "values": false
                 },
                 "textMode": "auto"
@@ -283,7 +283,7 @@
             "gridPos": {
                 "h": 4,
                 "w": 6,
-                "x": 0,
+                "x": 6,
                 "y": 4
             },
             "id": 5,
@@ -296,7 +296,7 @@
                     "calcs": [
                         "lastNotNull"
                     ],
-                    "fields": "",
+                    "fields": "/^newest_log$/",
                     "values": false
                 },
                 "textMode": "auto"
@@ -315,29 +315,6 @@
                     "refId": "A"
                 }
             ]
-        },
-        {
-            "datasource": {
-                "type": "grafana-postgresql-datasource",
-                "uid": "potentiel-db"
-            },
-            "fieldConfig": {
-                "defaults": {},
-                "overrides": []
-            },
-            "gridPos": {
-                "h": 4,
-                "w": 18,
-                "x": 6,
-                "y": 4
-            },
-            "id": 6,
-            "options": {
-                "content": "### Espace disque libre\n\nPostgreSQL standard n'expose pas directement l'espace disque libre du volume de la base via cette source de données.\n\nSi une métrique système ou une vue dédiée existe sur la plateforme, elle peut être branchée ici ensuite.",
-                "mode": "markdown"
-            },
-            "title": "Espace disque libre",
-            "type": "text"
         }
     ],
     "refresh": "5m",
