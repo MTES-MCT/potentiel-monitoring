@@ -14,6 +14,14 @@ dns_resolver =
 resolver <%= dns_resolver %> valid=<%= ENV['NGINX_DNS_VALID'] || '10s' %> ipv6=off;
 resolver_timeout <%= ENV['NGINX_RESOLVER_TIMEOUT'] || '2s' %>;
 
+upstream vector {
+  server vector.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal:<%= ENV['VECTOR_PORT'] || '9001' %>;
+}
+
+upstream grafana {
+  server grafana.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal:<%= ENV['GF_SERVER_HTTP_PORT'] || '9002' %>;
+}
+
 location /vector {
   proxy_http_version 1.1;
   proxy_connect_timeout <%= ENV['NGINX_PROXY_CONNECT_TIMEOUT'] || '2s' %>;
@@ -26,7 +34,7 @@ location /vector {
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Authorization $http_authorization;
   rewrite ^/vector/?(.*)$ /$1 break;
-  proxy_pass http://vector.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal:<%= ENV['VECTOR_PORT'] || '9001' %>;
+  proxy_pass http://vector;
 }
 
 location / {
@@ -41,5 +49,5 @@ location / {
   proxy_set_header X-Request-Id $request_id;
   proxy_set_header Upgrade $http_upgrade;
   proxy_set_header Connection "upgrade";
-  proxy_pass http://grafana.<%= ENV['SCALINGO_APPLICATION_ID'] %>.<%= ENV['SCALINGO_PRIVATE_NETWORK_ID'] %>.private-network.internal:<%= ENV['GF_SERVER_HTTP_PORT'] || '9002' %>;
+  proxy_pass http://grafana;
 }
