@@ -5,16 +5,21 @@ dns_resolver =
   File.readlines('/etc/resolv.conf')
     .map { |line| line[/^\s*nameserver\s+([^\s#]+)/, 1] }
     .compact
-    .first ||
+    .join(' ') ||
   '127.0.0.11'
 %>
 
 # Re-resolve private-network DNS names regularly so upstream dyno IP changes
 # do not require restarting nginx after a deployment.
 resolver <%= dns_resolver %> valid=<%= ENV['NGINX_DNS_VALID'] || '10s' %> ipv6=off;
+resolver_timeout <%= ENV['NGINX_RESOLVER_TIMEOUT'] || '2s' %>;
 
 location /vector {
   proxy_http_version 1.1;
+  proxy_connect_timeout <%= ENV['NGINX_PROXY_CONNECT_TIMEOUT'] || '2s' %>;
+  proxy_read_timeout <%= ENV['NGINX_PROXY_READ_TIMEOUT'] || '60s' %>;
+  proxy_next_upstream error timeout invalid_header http_502 http_503 http_504;
+  proxy_next_upstream_tries 3;
   proxy_set_header Host $http_host;
   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
   proxy_set_header X-Forwarded-Proto $scheme;
@@ -26,6 +31,10 @@ location /vector {
 
 location / {
   proxy_http_version 1.1;
+  proxy_connect_timeout <%= ENV['NGINX_PROXY_CONNECT_TIMEOUT'] || '2s' %>;
+  proxy_read_timeout <%= ENV['NGINX_PROXY_READ_TIMEOUT'] || '60s' %>;
+  proxy_next_upstream error timeout invalid_header http_502 http_503 http_504;
+  proxy_next_upstream_tries 3;
   proxy_set_header Host $http_host;
   proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
   proxy_set_header X-Forwarded-Proto $scheme;
