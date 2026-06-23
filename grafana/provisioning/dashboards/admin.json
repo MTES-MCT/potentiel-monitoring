@@ -40,7 +40,7 @@
                             }
                         ]
                     },
-                    "unit": "none"
+                    "unit": "locale"
                 },
                 "overrides": []
             },
