@@ -2,6 +2,7 @@ CREATE TABLE logs (
   ts TIMESTAMPTZ NOT NULL,
   message TEXT,
   container VARCHAR(100),
+  application VARCHAR(100),
   level VARCHAR(20),
   service VARCHAR(100),
   meta JSONB,
