@@ -60,9 +60,11 @@ if message_parts[2] != null {
     meta_match = parse_regex(message_parts[2], r'Metadata\((?<meta>.*)\)') ?? {}
     if meta_match.meta != null {
         .meta = parse_json(meta_match.meta) ?? null
-        .application = .meta.application
-        .meta.application = null
     }
+}
+if .meta != null {
+    .application = .meta.application
+    .meta.application = null
 }
 
 if .level == null {
