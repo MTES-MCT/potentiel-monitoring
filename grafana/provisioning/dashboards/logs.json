@@ -75,7 +75,7 @@
                     },
                     "format": "table",
                     "rawQuery": true,
-                    "rawSql": "SELECT count(*) AS total FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN (${level})) AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application}))",
+                    "rawSql": "SELECT count(*) AS total FROM logs WHERE $__timeFilter(ts) AND level IN (${level}) AND service IN (${service}) AND application IN (${application})",
                     "refId": "A"
                 }
             ]
@@ -139,7 +139,7 @@
                     },
                     "format": "table",
                     "rawQuery": true,
-                    "rawSql": "SELECT count(*) AS errors FROM logs WHERE $__timeFilter(ts) AND level = 'error' AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application}))",
+                    "rawSql": "SELECT count(*) AS errors FROM logs WHERE $__timeFilter(ts) AND level = 'error' AND service IN (${service}) AND application IN (${application})",
                     "refId": "A"
                 }
             ]
@@ -203,7 +203,7 @@
                     },
                     "format": "table",
                     "rawQuery": true,
-                    "rawSql": "SELECT count(*) AS warnings FROM logs WHERE $__timeFilter(ts) AND level = 'warn' AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application}))",
+                    "rawSql": "SELECT count(*) AS warnings FROM logs WHERE $__timeFilter(ts) AND level = 'warn' AND service IN (${service}) AND application IN (${application})",
                     "refId": "A"
                 }
             ]
@@ -336,7 +336,7 @@
                     },
                     "format": "time_series",
                     "rawQuery": true,
-                    "rawSql": "SELECT $__timeGroupAlias(ts,$__interval), count(*) FILTER (WHERE level = 'error') AS \"error\", count(*) FILTER (WHERE level = 'warn') AS \"warn\", count(*) FILTER (WHERE level = 'info') AS \"info\", count(*) FILTER (WHERE level = 'http') AS \"http\", count(*) FILTER (WHERE level = 'debug') AS \"debug\" FROM logs WHERE $__timeFilter(ts) AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application})) GROUP BY 1 ORDER BY 1",
+                    "rawSql": "SELECT $__timeGroupAlias(ts,$__interval), count(*) FILTER (WHERE level = 'error') AS \"error\", count(*) FILTER (WHERE level = 'warn') AS \"warn\", count(*) FILTER (WHERE level = 'info') AS \"info\", count(*) FILTER (WHERE level = 'http') AS \"http\", count(*) FILTER (WHERE level = 'debug') AS \"debug\" FROM logs WHERE $__timeFilter(ts) AND service IN (${service}) AND application IN (${application}) GROUP BY 1 ORDER BY 1",
                     "refId": "A"
                 }
             ]
@@ -360,7 +360,7 @@
                 {
                     "refId": "A",
                     "format": "table",
-                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN (${level})) AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application})) LIMIT 50 ",
+                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) AND level IN (${level}) AND service IN (${service}) AND application IN (${application}) LIMIT 50 ",
                     "table": "logs",
                     "datasource": {
                         "type": "grafana-postgresql-datasource",
@@ -464,7 +464,7 @@
                 "hide": 0,
                 "includeAll": true,
                 "label": "Service",
-                "multi": false,
+                "multi": true,
                 "name": "service",
                 "options": [],
                 "query": "SELECT DISTINCT service FROM logs WHERE service IS NOT NULL ORDER BY service",
