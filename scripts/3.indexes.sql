@@ -6,3 +6,4 @@ CREATE INDEX IF NOT EXISTS logs_container_distinct_idx ON logs (container) WITH 
 WHERE container IS NOT NULL;
 CREATE INDEX IF NOT EXISTS logs_application_distinct_idx ON logs (application) WITH (timescaledb.transaction_per_chunk)
 WHERE application IS NOT NULL;
+
