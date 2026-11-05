@@ -75,7 +75,7 @@
                     },
                     "format": "table",
                     "rawQuery": true,
-                    "rawSql": "SELECT count(*) AS total FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN ($level)) AND ('${service:csv}' = '' OR service IN ($service))",
+                    "rawSql": "SELECT count(*) AS total FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN (${level})) AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application}))",
                     "refId": "A"
                 }
             ]
@@ -139,7 +139,7 @@
                     },
                     "format": "table",
                     "rawQuery": true,
-                    "rawSql": "SELECT count(*) AS errors FROM logs WHERE $__timeFilter(ts) AND level = 'error' AND ('${service:csv}' = '' OR service IN ($service))",
+                    "rawSql": "SELECT count(*) AS errors FROM logs WHERE $__timeFilter(ts) AND level = 'error' AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application}))",
                     "refId": "A"
                 }
             ]
@@ -203,7 +203,7 @@
                     },
                     "format": "table",
                     "rawQuery": true,
-                    "rawSql": "SELECT count(*) AS warnings FROM logs WHERE $__timeFilter(ts) AND level = 'warn' AND ('${service:csv}' = '' OR service IN ($service))",
+                    "rawSql": "SELECT count(*) AS warnings FROM logs WHERE $__timeFilter(ts) AND level = 'warn' AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application}))",
                     "refId": "A"
                 }
             ]
@@ -336,7 +336,7 @@
                     },
                     "format": "time_series",
                     "rawQuery": true,
-                    "rawSql": "SELECT $__timeGroupAlias(ts,$__interval), count(*) FILTER (WHERE level = 'error') AS \"error\", count(*) FILTER (WHERE level = 'warn') AS \"warn\", count(*) FILTER (WHERE level = 'info') AS \"info\", count(*) FILTER (WHERE level = 'http') AS \"http\", count(*) FILTER (WHERE level = 'debug') AS \"debug\" FROM logs WHERE $__timeFilter(ts) AND ('${service:csv}' = '' OR service IN ($service)) GROUP BY 1 ORDER BY 1",
+                    "rawSql": "SELECT $__timeGroupAlias(ts,$__interval), count(*) FILTER (WHERE level = 'error') AS \"error\", count(*) FILTER (WHERE level = 'warn') AS \"warn\", count(*) FILTER (WHERE level = 'info') AS \"info\", count(*) FILTER (WHERE level = 'http') AS \"http\", count(*) FILTER (WHERE level = 'debug') AS \"debug\" FROM logs WHERE $__timeFilter(ts) AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application})) GROUP BY 1 ORDER BY 1",
                     "refId": "A"
                 }
             ]
@@ -360,7 +360,7 @@
                 {
                     "refId": "A",
                     "format": "table",
-                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN ($level)) AND ('${service:csv}' = '' OR service IN ($service)) LIMIT 50 ",
+                    "rawSql": "SELECT ts, message, meta, level, service FROM logs WHERE $__timeFilter(ts) AND ('${level:csv}' = '' OR level IN (${level})) AND ('${service:csv}' = '' OR service IN (${service})) AND ('${application:csv}' = '' OR application IN (${application})) LIMIT 50 ",
                     "table": "logs",
                     "datasource": {
                         "type": "grafana-postgresql-datasource",
@@ -442,11 +442,29 @@
                     "type": "postgres",
                     "uid": "potentiel-db"
                 },
+                "definition": "SELECT DISTINCT application FROM logs WHERE application IS NOT NULL ORDER BY application",
+                "hide": 0,
+                "includeAll": true,
+                "label": "App",
+                "multi": true,
+                "name": "application",
+                "options": [],
+                "query": "SELECT DISTINCT application FROM logs WHERE application IS NOT NULL ORDER BY application",
+                "refresh": 2,
+                "sort": 1,
+                "type": "query"
+            },
+            {
+                "current": {},
+                "datasource": {
+                    "type": "postgres",
+                    "uid": "potentiel-db"
+                },
                 "definition": "SELECT DISTINCT service FROM logs WHERE service IS NOT NULL ORDER BY service",
                 "hide": 0,
                 "includeAll": true,
                 "label": "Service",
-                "multi": true,
+                "multi": false,
                 "name": "service",
                 "options": [],
                 "query": "SELECT DISTINCT service FROM logs WHERE service IS NOT NULL ORDER BY service",
